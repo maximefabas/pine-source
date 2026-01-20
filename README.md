@@ -21,7 +21,7 @@ Dans un terminal :
 ```bash
 cd wherever/you/want
 git clone https://github.com/maximefabas/pine-source.git
-cd pine-source/meteociel
+cd pine-source
 npm install
 ```
 
