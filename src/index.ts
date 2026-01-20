@@ -29,7 +29,12 @@ async function selfAddCommitPush () {
     true,
     { cwd: PROJECT_ROOT }
   )
-  if (!added.success) throw 'Could not git add'
+  if (!added.success) {
+    console.log(added.error.stdout)
+    console.log(added.error.err)
+    console.log(added.error.stderr)
+    throw 'Could not git add'
+  }
   
   const commited = await spawner(
     'Commiting everything',
@@ -38,7 +43,26 @@ async function selfAddCommitPush () {
     true,
     { cwd: PROJECT_ROOT }
   )
-  if (!commited.success) throw 'Could not git commit'
+  if (!commited.success) {
+    console.log(commited.error.stdout)
+    console.log(commited.error.err)
+    console.log(commited.error.stderr)
+    throw 'Could not git commit'
+  }
+
+  const pushed = await spawner(
+    'Pushing to origin/main',
+    'git', ['push', 'origin', 'main'],
+    undefined,
+    true,
+    { cwd: PROJECT_ROOT }
+  )
+  if (!pushed.success) {
+    console.log(pushed.error.stdout)
+    console.log(pushed.error.err)
+    console.log(pushed.error.stderr)
+    throw 'Could not git push'
+  }
 }
 
 async function fetchMeteoCielPage (url: string): Promise<string> {
