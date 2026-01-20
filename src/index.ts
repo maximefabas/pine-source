@@ -10,19 +10,17 @@ const THIS_FILE = import.meta.url
 const PROJECT_ROOT = path.join(THIS_FILE.replace('file:', ''), '../../')
 const OUTPUT = path.join(PROJECT_ROOT, 'output')
 
-// const TARGET_URL = 'https://www.meteociel.fr/previsions/27827/paris_11eme_arrondissement.htm'
-// const TARGET
 const [_1, _2, TARGET_URL, CITY_NAME] = process.argv
 if (TARGET_URL === undefined) throw 'Please provide target url (first argument)'
 if (CITY_NAME === undefined) throw 'Please provide city name (second argument)'
 
 try {
-  const html = await fetchMeteoCielPage(TARGET_URL)
-  const jsonOutput = parseMeteoCielPage(html)
+  const html = await fetchMtClPage(TARGET_URL)
+  const jsonOutput = parseMtClPage(html)
   const sanitizedFileName = sanitizeFileName(`data.${CITY_NAME}.json`)
   if (sanitizedFileName === null) throw 'Could not sanitize output file name'
   const targetFile = path.join(OUTPUT, sanitizedFileName)
-  await writeParsedMeteoCielData(targetFile, jsonOutput, TARGET_URL)
+  await writeParsedMtClData(targetFile, jsonOutput, TARGET_URL)
   await selfAddCommitPush()
 } catch (err) {
   console.log(err)
@@ -45,7 +43,7 @@ async function selfAddCommitPush () {
   
   const commited = await spawner(
     'Commiting everything',
-    'git', ['commit', '-m', `Scraped on ${new Date().toISOString()}`],
+    'git', ['commit', '-m', `Data on ${new Date().toISOString()}`],
     undefined,
     true,
     { cwd: PROJECT_ROOT }
@@ -72,14 +70,14 @@ async function selfAddCommitPush () {
   }
 }
 
-async function fetchMeteoCielPage (url: string): Promise<string> {
+async function fetchMtClPage (url: string): Promise<string> {
   const fetched = await fetch(url)
   const buffer = await fetched.arrayBuffer()
   const html = new TextDecoder('iso-8859-1').decode(buffer)
   return html
 }
 
-async function writeParsedMeteoCielData (filePath: string, data: any, fetchedUrl: string): Promise<void> {
+async function writeParsedMtClData (filePath: string, data: any, fetchedUrl: string): Promise<void> {
   const now = Date.now()
   const nowDate = new Date()
   const targetJson = {
@@ -93,7 +91,7 @@ async function writeParsedMeteoCielData (filePath: string, data: any, fetchedUrl
   await writeFile(filePath, stringified, 'utf-8')
 }
 
-function parseMeteoCielPage (pageContent: string): any[] {
+function parseMtClPage (pageContent: string): any[] {
   const dom = new JSDOM(pageContent)
   const { document } = dom.window
   const forecastTableRows = Array
