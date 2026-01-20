@@ -6,7 +6,7 @@
   "scripts": {
     "check:src": "npx tsc -p src/tsconfig.json --noEmit",
     "build:src": "npm run check:src && node esbuild.config.js",
-    "scrap": "npm run build:src && node dist/index.js"
+    "update": "npm run build:src && node dist/index.js"
   },
   "dependencies": {
     "@design-edito/tools": "^0.2.40",
