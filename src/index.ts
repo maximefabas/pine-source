@@ -4,17 +4,24 @@ import { writeFile } from 'node:fs/promises'
 import { TextDecoder } from 'node:util'
 import { formatDate } from '@design-edito/tools/agnostic/time/dates/format-date/index.js'
 import { spawner } from '@design-edito/tools/node/process/spawner/index.js'
+import { sanitizeFileName } from '@design-edito/tools/agnostic/sanitization/file-name/index.js'
 
 const THIS_FILE = import.meta.url
 const PROJECT_ROOT = path.join(THIS_FILE.replace('file:', ''), '../../')
 const OUTPUT = path.join(PROJECT_ROOT, 'output')
 
-const TARGET_URL = 'https://www.meteociel.fr/previsions/27827/paris_11eme_arrondissement.htm'
+// const TARGET_URL = 'https://www.meteociel.fr/previsions/27827/paris_11eme_arrondissement.htm'
+// const TARGET
+const [_1, _2, TARGET_URL, CITY_NAME] = process.argv
+if (TARGET_URL === undefined) throw 'Please provide target url (first argument)'
+if (CITY_NAME === undefined) throw 'Please provide city name (second argument)'
 
 try {
   const html = await fetchMeteoCielPage(TARGET_URL)
   const jsonOutput = parseMeteoCielPage(html)
-  const targetFile = path.join(OUTPUT, 'data.paris11.json')
+  const sanitizedFileName = sanitizeFileName(`data.${CITY_NAME}.json`)
+  if (sanitizedFileName === null) throw 'Could not sanitize output file name'
+  const targetFile = path.join(OUTPUT, sanitizedFileName)
   await writeParsedMeteoCielData(targetFile, jsonOutput, TARGET_URL)
   await selfAddCommitPush()
 } catch (err) {
